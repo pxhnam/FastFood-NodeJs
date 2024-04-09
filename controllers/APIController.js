@@ -16,13 +16,31 @@ class APIController {
   Index(req, res) {}
   async Products(req, res) {
     try {
-      const products = await Product.find({ is_delete: false })
-        .populate('category')
-        .exec();
+      const pageSize = 5;
+      const { category, searchKey, page } = req.query;
+      let query = { is_delete: false };
+
+      if (category) {
+        query.category = category;
+      }
+
+      if (searchKey) {
+        query.$or = [
+          { name: { $regex: searchKey, $options: 'i' } },
+          { desc: { $regex: searchKey, $options: 'i' } },
+        ];
+      }
+
+      const products = await Product.find(query)
+        .limit(pageSize)
+        .skip((page - 1) * pageSize);
+
+      const totalCount = await Product.countDocuments(query);
 
       res.json({
         success: true,
         products,
+        totalPages: Math.ceil(totalCount / pageSize),
       });
     } catch (error) {
       console.error('Lỗi khi lấy sản phẩm:', error);
@@ -31,11 +49,29 @@ class APIController {
   }
   async Categories(req, res) {
     try {
-      const categories = await Category.find({ is_delete: false });
-      res.json({
-        success: true,
-        categories,
-      });
+      const pageSize = 5;
+      const { searchKey, page } = req.query;
+
+      if (searchKey && page) {
+        const categories = await Category.find({
+          is_delete: false,
+          name: { $regex: searchKey, $options: 'i' },
+        })
+          .limit(pageSize)
+          .skip((page - 1) * pageSize);
+
+        const totalCount = await Category.countDocuments({
+          content: { $regex: searchKey, $options: 'i' },
+        });
+        return res.json({
+          success: true,
+          categories,
+          totalPages: Math.ceil(totalCount / pageSize),
+        });
+      } else {
+        const categories = await Category.find({ is_delete: false });
+        return res.json({ success: true, categories });
+      }
     } catch (error) {
       console.error('Lỗi khi lấy thể loại:', error);
       res.status(500).json({ success: false, message: 'Lỗi server' });
@@ -422,10 +458,16 @@ class APIController {
     try {
       const pageSize = 5;
       const { searchKey, page } = req.query;
-
       const orders = await Order.find({
         content: { $regex: searchKey, $options: 'i' },
+      })
+        .limit(pageSize)
+        .skip((page - 1) * pageSize);
+
+      const totalCount = await Order.countDocuments({
+        content: { $regex: searchKey, $options: 'i' },
       });
+
       res.json({
         success: true,
         orders: orders.map((order) => ({
@@ -435,6 +477,7 @@ class APIController {
           status: order.status,
           createdAt: order.createdAt,
         })),
+        totalPages: Math.ceil(totalCount / pageSize),
       });
     } catch (error) {
       console.error(error);

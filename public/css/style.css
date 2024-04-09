@@ -31,7 +31,7 @@
     top: 5px !important;
     left: 35px !important
 }
-input, select, textarea, button {
+input, select, textarea, button, .page-link {
   box-shadow: none !important;
 }
 /* Ẩn nút tăng giảm cho tất cả các trình duyệt */

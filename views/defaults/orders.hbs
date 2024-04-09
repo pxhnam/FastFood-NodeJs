@@ -22,6 +22,11 @@
             <tbody></tbody>
         </table>
     </div>
+    <div class="d-flex justify-content-center align-items-center py-5">
+        <nav aria-label="Page navigation">
+            <ul class="pagination"></ul>
+        </nav>
+    </div>
 </div>
 <script>
     var timer;
@@ -34,7 +39,7 @@
         timer = setTimeout(() => {
             loadData($(this).val(), 1);
         }, 500);
-    })
+    });
     function loadData(searchKey, page) {
         $.ajax({
             url: '/api/orders',
@@ -43,6 +48,7 @@
             success: (res) => {
                 if (res.success) {
                     $('#tbl-Orders').find('tbody').empty();
+                    $('.pagination').empty();
                     $(res.orders).each(function (i, v) {
                         $('#tbl-Orders').find('tbody').append(
                             createRow(
@@ -50,11 +56,22 @@
                             )
                         );
                     });
+                    if (res.totalPages > 1) {
+                        for (i = 1; i <= res.totalPages; i++) {
+                            $('.pagination').append(`<li class="page-item${i == page ? ' active' : ' '}"><a class="page-link" href="#">${i}</a></li>`);
+                        }
+                    }
                 }
             },
             error: () => { }
         });
     }
+    $('.pagination').on('click', 'li', function (e) {
+        e.preventDefault();
+        page = $(this).text();
+        loadData($('#inputSearch').val(), page);
+    })
+
     $(document).on('click', '#btnInfor', function () {
         let id = $(this).closest('tr').data('id');
         $.ajax({

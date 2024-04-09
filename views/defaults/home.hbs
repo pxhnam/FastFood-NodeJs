@@ -14,15 +14,33 @@
     </div>
     <div class="row" id="main">
     </div>
+    <div class="d-flex justify-content-center align-items-center py-5">
+        <nav aria-label="Page navigation">
+            <ul class="pagination"></ul>
+        </nav>
+    </div>
 </div>
 <script>
+    var timer;
+    var page = 1;
     $(document).ready(function () {
-        loadData();
+        loadData('', '', 1);
         loadCategories();
     });
-    function loadData() {
+    $('#category').change(function () {
+        loadData($(this).val(), $('#inputSearch').val(), 1);
+    });
+
+    $('#inputSearch').on('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            loadData($('#category').val(), $(this).val(), 1);
+        }, 500);
+    })
+    function loadData(category, searchKey, page) {
         $.ajax({
             url: '/api/products',
+            data: { category, searchKey, page },
             type: 'GET',
             success: (data) => {
                 if (data.success) {
@@ -31,9 +49,19 @@
                         $('#main').append(cardBox(e._id, e.name, e.desc, e.img));
                     });
                 }
+                if (data.totalPages > 1) {
+                    for (i = 1; i <= data.totalPages; i++) {
+                        $('.pagination').append(`<li class="page-item${i == page ? ' active' : ' '}"><a class="page-link" href="#">${i}</a></li>`);
+                    }
+                }
             }
         });
     }
+    $('.pagination').on('click', 'li', function (e) {
+        e.preventDefault();
+        page = $(this).text();
+        loadData($('#category').val(), $('#inputSearch').val(), page);
+    })
     function loadCategories() {
         $.ajax({
             url: '/api/categories',
