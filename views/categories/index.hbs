@@ -71,7 +71,7 @@
         id = '';
         showModal('Create Category',
             `<div class="form-floating mb-3">
-                <input type="text" class="form-control" id="name" name="name" placeholder="">
+                <input type="text" class="form-control" id="name" name="name" placeholder="" autofocus>
                 <label for="name">Name</label>
             </div>
         `);
@@ -86,7 +86,7 @@
                 showModal('Update Category',
                     `<div class="form-floating mb-3">
                         <input type="text" class="form-control" id="name" name="name" 
-                        value="${res.category.name}" placeholder="">
+                        value="${res.category.name}" placeholder="" autofocus>
                         <label for="name">Name</label>
                      </div>`
                 );

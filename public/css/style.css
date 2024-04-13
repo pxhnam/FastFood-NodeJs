@@ -46,8 +46,6 @@ input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-/* Toast */
- 
   /* ======= Toast message ======== */
   
   #toast {

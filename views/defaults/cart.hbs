@@ -1,8 +1,8 @@
 <div class="row d-flex justify-content-center">
     <div class="col-8 card mb-4">
         <div class="card-header py-3 d-flex justify-content-between">
-            <h5 class="mb-0">Cart</h5>
-            <a href="#" class="text-decoration-none" id="btnClearCart">Remove All</a>
+            <h5 class="mb-0">CART</h5>
+            <a href="#" class="text-decoration-none text-danger" id="btnClearCart">CLEAR</a>
         </div>
         <div class="card-body" id="main-cart"></div>
     </div>
@@ -120,6 +120,7 @@
                 success: (res) => {
                     if (res.success) {
                         countCart();
+                        loadData();
                     }
                 },
                 error: () => { }

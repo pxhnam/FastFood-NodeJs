@@ -40,11 +40,12 @@
     function loadData(category, searchKey, page) {
         $.ajax({
             url: '/api/products',
-            data: { category, searchKey, page },
+            data: { category, searchKey, page, pageSize: 8 },
             type: 'GET',
             success: (data) => {
                 if (data.success) {
                     $('#main').empty();
+                    $('.pagination').empty();
                     $(data.products).each(function (i, e) {
                         $('#main').append(cardBox(e._id, e.name, e.desc, e.img));
                     });
@@ -99,7 +100,7 @@
                     );
                 } else {
                     toast({
-                        title: "Thất bại!",
+                        title: "Thất Bại",
                         message: res.message,
                         type: "error",
                         duration: 5000
@@ -118,7 +119,7 @@
             success: (res) => {
                 if (res.success) {
                     toast({
-                        title: "Thành công!",
+                        title: "Thành Công",
                         message: res.message,
                         type: "success",
                         duration: 5000

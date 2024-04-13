@@ -57,7 +57,7 @@
     function loadData(category, searchKey, page) {
         $.ajax({
             url: '/api/products',
-            data: { category, searchKey, page },
+            data: { category, searchKey, page, pageSize: 10 },
             type: 'GET',
             success: (res) => {
                 if (res.success) {
@@ -110,7 +110,7 @@
                         type: "success",
                         duration: 5000
                     });
-                    loadData();
+                    loadData($('#category').val(), $(this).val(), 1);
                 } else {
                     toast({
                         title: "Thất bại!",

@@ -2,22 +2,7 @@ const express = require('express');
 const router = express.Router();
 const APIController = require('../controllers/APIController');
 const { Authorize, Authenticate } = require('../middleware');
-const path = require('path');
-const multer = require('multer');
-
-// Khởi tạo multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/img/');
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + ext);
-  },
-});
-const upload = multer({ storage: storage });
-
+const upload = require('../config/multer');
 //POST
 router.post('/change-infor', Authenticate, APIController.changeInfor);
 router.post('/change-password', Authenticate, APIController.changePassword);

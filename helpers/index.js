@@ -49,8 +49,8 @@ async function comparePasswords(plainPassword, hashedPassword) {
   }
 }
 
-function generateToken(_id) {
-  return jwt.sign({ _id }, KEY_SECRET, { expiresIn: '1h' });
+function generateToken(user) {
+  return jwt.sign({ _id: user._id }, KEY_SECRET, { expiresIn: '1h' });
 }
 
 function verifyToken(token) {
@@ -60,7 +60,6 @@ function verifyToken(token) {
     throw new Error('Token không hợp lệ: ' + error.message);
   }
 }
-
 
 module.exports = {
   isValidEmail,

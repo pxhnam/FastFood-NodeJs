@@ -12,12 +12,12 @@ const {
   generateToken,
   verifyToken,
 } = require('../helpers');
+
 class APIController {
   Index(req, res) {}
   async Products(req, res) {
     try {
-      const pageSize = 5;
-      const { category, searchKey, page } = req.query;
+      const { category, searchKey, page, pageSize } = req.query;
       let query = { is_delete: false };
 
       if (category) {
@@ -33,7 +33,9 @@ class APIController {
 
       const products = await Product.find(query)
         .limit(pageSize)
-        .skip((page - 1) * pageSize);
+        .skip((page - 1) * pageSize)
+        .populate('category')
+        .exec();
 
       const totalCount = await Product.countDocuments(query);
 
@@ -44,12 +46,12 @@ class APIController {
       });
     } catch (error) {
       console.error('Lỗi khi lấy sản phẩm:', error);
-      res.status(500).json({ success: false, message: 'Lỗi server' });
+      res.status(500).json({ success: false, message: error });
     }
   }
   async Categories(req, res) {
     try {
-      const pageSize = 5;
+      const pageSize = 10;
       const { searchKey, page } = req.query;
 
       if (searchKey && page) {
@@ -74,7 +76,7 @@ class APIController {
       }
     } catch (error) {
       console.error('Lỗi khi lấy thể loại:', error);
-      res.status(500).json({ success: false, message: 'Lỗi server' });
+      res.status(500).json({ success: false, message: error });
     }
   }
 
@@ -216,28 +218,25 @@ class APIController {
 
   async updateProduct(req, res) {
     try {
-      // let { id, name, quantity, price, category, desc } = req.body;
       let id = req.body.id || '';
       let name = req.body.name || '';
-      let quantity = req.body.quantity || '';
       let price = req.body.price || '';
       let category = req.body.category || '';
       let description = req.body.description || '';
 
       name = name.trim();
-      quantity = quantity.trim();
       price = price.trim();
       description = description.trim();
-      if (!name || !quantity || !price || !description) {
+      if (!name || !price || !description) {
         return res.json({
           success: false,
           message: 'Vui lòng điền đầy đủ thông tin.',
         });
       }
-      if (isNaN(quantity) || isNaN(price)) {
+      if (isNaN(price)) {
         return res.json({
           success: false,
-          message: 'Quantity và price phải là số.',
+          message: 'Vui lòng nhập lại giá.',
         });
       }
       if (category == '0') {
@@ -257,7 +256,6 @@ class APIController {
           name: name,
           img: req.file.filename,
           price: price,
-          quantity: quantity,
           desc: description,
           category: category,
         });
@@ -269,7 +267,6 @@ class APIController {
         }
         prod.name = name;
         prod.price = price;
-        prod.quantity = quantity;
         prod.desc = description;
         prod.category = category;
         await prod.save();
@@ -456,7 +453,7 @@ class APIController {
 
   async Orders(req, res) {
     try {
-      const pageSize = 5;
+      const pageSize = 10;
       const { searchKey, page } = req.query;
       const orders = await Order.find({
         content: { $regex: searchKey, $options: 'i' },
@@ -573,28 +570,23 @@ class APIController {
       });
     }
     try {
-      // Tìm người dùng trong cơ sở dữ liệu
       const user = await User.findOne({ email });
 
       if (user) {
-        // So sánh mật khẩu
         const passwordMatch = await comparePasswords(password, user.password);
 
         if (passwordMatch) {
-          const token = generateToken(user._id);
+          const token = generateToken(user);
           res.cookie('token', token, {
             maxAge: 1 * 60 * 60 * 1000,
             httpOnly: true,
           });
-          return res.json({
-            success: true,
-            message: 'Đăng nhập thành công.',
-          });
+          return res.json({ success: true });
         }
       }
       return res.json({
         success: false,
-        message: 'Tài khoản, mật khẩu không chính xác.',
+        message: 'Tài khoản hoặc mật khẩu không chính xác.',
       });
     } catch (error) {
       console.error(error);

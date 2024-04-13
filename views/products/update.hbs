@@ -13,10 +13,10 @@
                     <img width="600px">
                 </div>
             </div>
-            <div class="form-floating mb-3">
+            {{!-- <div class="form-floating mb-3">
                 <input type="number" class="form-control" id="quantity" name="quantity" placeholder="">
                 <label for="quantity">Quantity</label>
-            </div>
+            </div> --}}
             <div class="form-floating mb-3">
                 <input type="number" class="form-control" id="price" name="price" placeholder="">
                 <label for="price">Price</label>
@@ -57,7 +57,7 @@
                 if (res.success) {
                     const prod = res.product;
                     $('#name').val(prod.name);
-                    $('#quantity').val(prod.quantity);
+                    //$('#quantity').val(prod.quantity);
                     $('#price').val(prod.price);
                     $('#description').text(prod.desc);
                     loadCategories(prod.category._id);
